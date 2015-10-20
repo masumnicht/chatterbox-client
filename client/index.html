@@ -7,6 +7,7 @@
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
@@ -17,5 +18,10 @@
       <!-- Your HTML goes here! -->
     </div>
     <div id="chats"></div>
+    <form action="" name='UserInput' onsubmit="return false">
+      Message:
+      <input type="text"> 
+      <input type="button" value='Submit Message' class='button'>
+    </form>
   </body>
 </html>
