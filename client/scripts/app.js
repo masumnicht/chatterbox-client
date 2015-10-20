@@ -5,7 +5,9 @@ var app = {
 
 var currentTime = Date.now();
 var username = window.location.search.replace('?username=', '');
-var room = 'default';
+var roomname = 'default';
+var rooms = [];
+var allMessages = [];
 
 app.init = function() {
 
@@ -57,21 +59,25 @@ app.fetch = function() {
         if (data.results[i].text === undefined){
           data.results[i].text = '';
         }
-        if (data.results[i].room === undefined){
-          data.results[i].room = '';
+        if (data.results[i].roomname === undefined){
+          data.results[i].roomname = '';
         }
         if (data.results[i].username === undefined){
           data.results[i].username = '';
         }
-        var msg = $('<span display="in-line">' + 'msg:' + escapedString(data.results[i].text) + '</span>')
-        var name = $('<div>' + 'name:' + escapedString(data.results[i].username) + '</div>')
+        allMessages.push(data.results[i]);
+        if(!_.contains(rooms, data.results[i].roomname)){
+          rooms.push(data.results[i].roomname);
+          $('.roomName').append($('<option>' + escapedString(data.results[i].roomname) + '</option>'));
+        }
+        var msg = $('<span display="in-line">' + 'msg:' + escapedString(data.results[i].text) + '</span>');
+        var name = $('<div>' + 'name:' + escapedString(data.results[i].username) + '</div>');
         $('#chats').prepend(name);
         $('#chats').prepend(msg);
-        $('#chats').prepend($('<span display="in-line">' + 'time:' + data.results[i].createdAt + '</span>'))
-        $('#chats').prepend($('<span display="in-line">' + '--------------------------------------' + '</span>'))
+        $('#chats').prepend($('<span display="in-line">' + 'time:' + data.results[i].createdAt + '</span>'));
+        $('#chats').prepend($('<span display="in-line">' + '--------------------------------------' + '</span>'));
         i--;
       }
-      //currentTime = Date.now();
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -89,13 +95,19 @@ $(document).ready(function(){
     event.preventDefault();
     var message = {
       username: username,
-      room: room,
-      text: $('form')[0][0].value
+      roomname: roomname,
+      text: $('form')[0][1].value
     }
     app.send(message);
     // $('form')[0][0].value = '';
   });
+  $(".roomName").change(function(something){
+    event.preventDefault();
+    var room = $('form')[0][0].value;
+    console.log(room);
+  });
 });
+
 
 
 var escapedString = function(str){
@@ -112,12 +124,10 @@ var escapedString = function(str){
 };
 
 app.clearMessages = function() {
-  $('#chats').text = ''
+  $('#chats').html('');
 }
 
-app.addMessages = function() {
-
-}
+app.addMessages = app.send;
 
 app.addRoom = function() {
 
