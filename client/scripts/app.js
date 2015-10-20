@@ -5,9 +5,11 @@ var app = {
 
 var currentTime = Date.now();
 var username = window.location.search.replace('?username=', '');
-var roomname = 'default';
-var rooms = [];
+//var roomname = 'General';
+var rooms = ['General'];
 var allMessages = [];
+var curRoom = 'General';
+var friends = [];
 
 app.init = function() {
 
@@ -59,8 +61,8 @@ app.fetch = function() {
         if (data.results[i].text === undefined){
           data.results[i].text = '';
         }
-        if (data.results[i].roomname === undefined){
-          data.results[i].roomname = '';
+        if (data.results[i].roomname === undefined || data.results[i].roomname.trim() === ''){
+          data.results[i].roomname = 'General';
         }
         if (data.results[i].username === undefined){
           data.results[i].username = '';
@@ -70,15 +72,14 @@ app.fetch = function() {
           rooms.push(data.results[i].roomname);
           $('.roomName').append($('<option>' + escapedString(data.results[i].roomname) + '</option>'));
         }
-        var name = $('<div>' +
-                      'User Name:<a href = "#" class = "userName">' + escapedString(data.results[i].username) + '</a>' +
-                      '<div>' + 'msg:' + escapedString(data.results[i].text) + '</div>' +
-                    '</div>');
-        // var msg = $('<div display="in-line">' + 'msg:' + escapedString(data.results[i].text) + '</div>');
-        $('#chats').prepend(name);
-        
+        if(escapedString(data.results[i].roomname) === curRoom || curRoom === 'General'){
+          var messageEl = $('<div>' +
+                        'User Name:<a href = "#" class = "'+ escapedString(allMessages[i].username).replace(/ /g, '') +'">' + escapedString(data.results[i].username) + '</a>' +
+                        '<div>' + 'msg:' + escapedString(data.results[i].text) + '</div>' +
+                      '</div>');
+          $('#chats').prepend(messageEl);
+        }  
         // $('#chats').prepend($('<span display="in-line">' + 'time:' + data.results[i].createdAt + '</span>'));
-        // $('#chats').prepend($('<span display="in-line">' + '--------------------------------------' + '</span>'));
         i--;
       }
     },
@@ -94,21 +95,75 @@ setInterval(function() {
 }, 1000);
 
 $(document).ready(function(){
-  $(".button").on('click', function(event){
+  $("#buttonMessage").on('click', function(event){
     event.preventDefault();
     var message = {
       username: username,
-      roomname: roomname,
-      text: $('form')[0][1].value
+      roomname: curRoom,
+      text: $('form')[0][3].value
     }
     app.send(message);
-    // $('form')[0][0].value = '';
+    $('form')[0][3].value = '';
   });
+  
+  $('#newRoom').on('keydown', function(event){
+    if(event.keyCode === 13){
+      if(!_.contains(rooms, $('form')[0][1].value)){
+        curRoom = $('form')[0][1].value;
+        rooms.push(curRoom);
+        $('.roomName').append($('<option>' + curRoom + '</option>'));
+      }
+      $('.roomName').val(curRoom);
+      $('.roomName').trigger('change');
+      $('form')[0][1].value = '';  
+    }
+  });
+  
+  $('#messageForm').on('keydown', function(event){
+    if(event.keyCode === 13){
+      var message = {
+        username: username,
+        roomname: curRoom,
+        text: $('form')[0][3].value
+      }
+      app.send(message);
+      $('form')[0][3].value = '';
+    }
+  });
+
+  $("#buttonRoom").on('click', function(event){
+    event.preventDefault();
+    if(!_.contains(rooms, $('form')[0][1].value)){
+      curRoom = $('form')[0][1].value;
+      rooms.push(curRoom);
+      $('.roomName').append($('<option>' + curRoom + '</option>'));
+    }
+    $('.roomName').val(curRoom);
+    $('.roomName').trigger('change');
+    $('form')[0][1].value = '';   
+  });
+  
   $(".roomName").change(function(something){
     event.preventDefault();
-    var room = $('form')[0][0].value;
-    console.log(room);
+    curRoom = $('form')[0][0].value;
+    app.clearMessages();
+    for(var i = 0; i < allMessages.length; i++){
+      if(allMessages[i].roomname === curRoom || curRoom === 'General'){
+        var messageEl = $('<div>' +
+              'User Name:<a href = "#" class = "'+ escapedString(allMessages[i].username).replace(/ /g, '') +'">' + escapedString(allMessages[i].username) + '</a>' +
+              '<div>' + 'msg:' + escapedString(allMessages[i].text) + '</div>' +
+            '</div>');  
+        $('#chats').prepend(messageEl);
+      }
+    }
   });
+
+  $(this).on('click', 'a', function() {
+    // var user = this.getAttribute('class');
+    //friends.push(user);
+    $(this).toggleClass('bold');
+    //$(this).
+  })
 });
 
 
@@ -122,7 +177,8 @@ var escapedString = function(str){
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/\"/g, '&quot;')
-      .replace(/\'/g, '&#39;');
+      .replace(/\'/g, '&#39;')
+      .replace(/%20/g, ' ');
   return newStr;
 };
 
@@ -131,15 +187,3 @@ app.clearMessages = function() {
 }
 
 app.addMessages = app.send;
-
-app.addRoom = function() {
-
-}
-
-app.addFriend = function() {
-
-}
-
-app.handleSubmit = function() {
-
-}
