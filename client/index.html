@@ -16,15 +16,16 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-    </div>
     <form action="" name='UserInput' onsubmit="return false">
-      <select class='roomName'>
+      <label for='roomName'> Room :</label>
+      <select class='roomName' value='roomName'>
         <option>General</option>
-      </select>
-      Message:
-      <input type="text"> 
+      </select><br>
+      <label for='message' > Post Message :</label>
+      <input type="text" name ='message' style="height: 100px;"> 
       <input type="button" value='Submit Message' class='button'>
     </form>
+    </div>
 
     <div id="chats"></div>
   </body>

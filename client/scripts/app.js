@@ -70,12 +70,15 @@ app.fetch = function() {
           rooms.push(data.results[i].roomname);
           $('.roomName').append($('<option>' + escapedString(data.results[i].roomname) + '</option>'));
         }
-        var msg = $('<span display="in-line">' + 'msg:' + escapedString(data.results[i].text) + '</span>');
-        var name = $('<div>' + 'name:' + escapedString(data.results[i].username) + '</div>');
+        var name = $('<div>' +
+                      'User Name:<a href = "#" class = "userName">' + escapedString(data.results[i].username) + '</a>' +
+                      '<div>' + 'msg:' + escapedString(data.results[i].text) + '</div>' +
+                    '</div>');
+        // var msg = $('<div display="in-line">' + 'msg:' + escapedString(data.results[i].text) + '</div>');
         $('#chats').prepend(name);
-        $('#chats').prepend(msg);
-        $('#chats').prepend($('<span display="in-line">' + 'time:' + data.results[i].createdAt + '</span>'));
-        $('#chats').prepend($('<span display="in-line">' + '--------------------------------------' + '</span>'));
+        
+        // $('#chats').prepend($('<span display="in-line">' + 'time:' + data.results[i].createdAt + '</span>'));
+        // $('#chats').prepend($('<span display="in-line">' + '--------------------------------------' + '</span>'));
         i--;
       }
     },
